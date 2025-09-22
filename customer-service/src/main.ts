@@ -16,7 +16,7 @@ async function bootstrap() {
 
   // ✅ Enable CORS for frontend on port 5000
   app.enableCors({
-    origin: 'http://localhost:5000',
+    origin: 'http://localhost:8000',
   });
 
   await app.startAllMicroservices();

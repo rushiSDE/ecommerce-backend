@@ -1,0 +1,299 @@
+# # version: "3.9"
+
+# # services:
+# #   customer-service:
+# #     build:
+# #       context: ./customer-service
+# #       dockerfile: Dockerfile
+# #     ports:
+# #       - "3001:3000"  # Map internal 3000 to host 3001
+# #     environment:
+# #       NODE_ENV: development
+# #     depends_on:
+# #       - postgres
+# #       - rabbitmq
+
+# #   product-order-service:
+# #     build:
+# #       context: ./product-order-service
+# #       dockerfile: Dockerfile
+# #     ports:
+# #       - "3002:3000"  # Map internal 3000 to host 3002
+# #     environment:
+# #       NODE_ENV: development
+# #     depends_on:
+# #       - postgres
+# #       - rabbitmq
+
+# #   postgres:
+# #     image: postgres:15
+# #     environment:
+# #       POSTGRES_USER: postgres
+# #       POSTGRES_PASSWORD: Rushi@772244
+# #       POSTGRES_DB: microservices
+# #     ports:
+# #       - "5432:5432"
+# #     volumes:
+# #       - pgdata:/var/lib/postgresql/data
+
+# #   rabbitmq:
+# #     image: rabbitmq:3-management
+# #     ports:
+# #       - "5672:5672"
+# #       - "15672:15672" # RabbitMQ management UI
+
+# # volumes:
+# #   pgdata:
+
+
+
+
+
+# version: '3.9'
+
+# services:
+#   # Customer Service
+#   customer-service:
+#     build: ./customer-service
+#     container_name: customer-service
+#     restart: always
+#     env_file:
+#       - ./customer-service/.env
+#     ports:
+#       - "3001:3000" # maps host 3001 to container 3000
+#     depends_on:
+#       - customer-postgres
+#     networks:
+#       - app-network
+
+#   # Customer Service DB
+#   customer-postgres:
+#     image: postgres:15
+#     container_name: customer-postgres
+#     restart: always
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: ${CUSTOMER_DB_PASSWORD}
+#       POSTGRES_DB: customers_db
+#     ports:
+#       - "5432:5432"
+#     networks:
+#       - app-network
+#     volumes:
+#       - customer-data:/var/lib/postgresql/data
+
+#   # Products & Orders Service
+#   products-service:
+#     build: ./products-service
+#     container_name: products-service
+#     restart: always
+#     env_file:
+#       - ./products-service/.env
+#     ports:
+#       - "3002:3000"
+#     depends_on:
+#       - products-postgres
+#     networks:
+#       - app-network
+
+#   # Products & Orders DB
+#   products-postgres:
+#     image: postgres:15
+#     container_name: products-postgres
+#     restart: always
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: ${PRODUCTS_DB_PASSWORD}
+#       POSTGRES_DB: products_orders_db
+#     ports:
+#       - "5433:5432"
+#     networks:
+#       - app-network
+#     volumes:
+#       - products-data:/var/lib/postgresql/data
+
+# # Networks
+# networks:
+#   app-network:
+#     driver: bridge
+
+# # Volumes
+# volumes:
+#   customer-data:
+#   products-data:
+
+
+
+
+# version: '3.9'
+
+# services:
+#   # Customer Service
+#   customer-service:
+#     build: ./customer-service
+#     container_name: customer-service
+#     restart: always
+#     env_file:
+#       - ./customer-service/.env
+#     ports:
+#       - "3001:3005" # maps host 3001 to container 3000
+#     depends_on:
+#       - customer-postgres
+#       - rabbitmq
+#     networks:
+#       - app-network
+
+#   # Customer Service DB
+#   customer-postgres:
+#     image: postgres:15
+#     container_name: customer-postgres
+#     restart: always
+#     environment:
+#       POSTGRES_USER: ${POSTGRES_USER}
+#     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     POSTGRES_DB: ${POSTGRES_DB}
+#     ports:
+#       - "5434:5432"
+#     networks:
+#       - app-network
+#     volumes:
+#       - customer-data:/var/lib/postgresql/data
+
+#   # Products & Orders Service
+#   products-service:
+#     build: ./product-order-service
+#     container_name: products-service
+#     restart: always
+#     env_file:
+#       - ./product-order-service/.env
+
+#     ports:
+#       - "3002:3005"
+#     depends_on:
+#       - products-postgres
+#       - rabbitmq
+#     networks:
+#       - app-network
+
+#   # Products & Orders DB
+#   products-postgres:
+#     image: postgres:15
+#     container_name: products-postgres
+#     restart: always
+#     environment:
+#       POSTGRES_USER: ${POSTGRES_USER}
+#     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     POSTGRES_DB: ${POSTGRES_DB}
+#     ports:
+#       - "5433:5432"
+#     networks:
+#       - app-network
+#     volumes:
+#       - products-data:/var/lib/postgresql/data
+
+#   # RabbitMQ for messaging
+#   rabbitmq:
+#     image: rabbitmq:3-management
+#     container_name: rabbitmq
+#     restart: always
+#     ports:
+#       - "5672:5672"
+#       - "15672:15672" # management UI
+#     networks:
+#       - app-network
+
+# # Networks
+# networks:
+#   app-network:
+#     driver: bridge
+
+# # Volumes
+# volumes:
+#   customer-data:
+#   products-data:
+
+
+
+
+
+version: '3.9'
+
+services:
+  # Customer Service
+  customer-service:
+    build: ./customer-service
+    container_name: customer-service
+    restart: always
+    env_file:
+      - ./customer-service/.env
+    ports:
+      - "3001:3000"
+    depends_on:
+      - customer-postgres
+      - rabbitmq
+    networks:
+      - app-network
+
+  # Customer Service DB
+  customer-postgres:
+    image: postgres:15
+    container_name: customer-postgres
+    restart: always
+    env_file:
+      - ./customer-service/.env
+    ports:
+      - "5433:5432"
+    networks:
+      - app-network
+    volumes:
+      - customer-data:/var/lib/postgresql/data
+
+  # Products & Orders Service
+  products-service:
+    build: ./product-order-service
+    container_name: products-service
+    restart: always
+    env_file:
+      - ./product-order-service/.env
+    ports:
+      - "3002:3000"
+    depends_on:
+      - products-postgres
+      - rabbitmq
+    networks:
+      - app-network
+
+  # Products & Orders DB
+  products-postgres:
+    image: postgres:15
+    container_name: products-postgres
+    restart: always
+    env_file:
+      - ./product-order-service/.env
+    ports:
+      - "5433:5432"
+    networks:
+      - app-network
+    volumes:
+      - products-data:/var/lib/postgresql/data
+
+  # RabbitMQ for messaging
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+
+# Networks
+networks:
+  app-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  customer-data:
+  products-data:
